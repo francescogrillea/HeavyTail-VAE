@@ -24,15 +24,18 @@ class VAE(torch.nn.Module):
         )
 
     def encode(self, x):
-        pass
+        raise NotImplementedError(f"Method encode not implemented in {self.__class__.__name__}")
 
     def generate(self, *args):
-        pass
+        raise NotImplementedError(f"Method generate not implemented in {self.__class__.__name__}")
 
-    def forward(self, x):
+    def forward(self, x, return_kl=False):
         params = self.encode(x)
-        reconstructed = self.generate(*params)
+        if return_kl:
+            reconstructed, kl = self.generate(*params, return_kl=return_kl)
+            return reconstructed, kl
 
+        reconstructed = self.generate(*params, return_kl=return_kl)
         return reconstructed
 
 
@@ -51,13 +54,16 @@ class GaussianVAE(VAE):
 
         return mu, logvar
 
-    def generate(self, mu, logvar):
+    def generate(self, mu, logvar, return_kl=False):
         std = torch.exp(0.5 * logvar)
-        p = torch.randn(1)
-        z = mu + p * std
+        pdf = torch.distributions.Normal(loc=mu, scale=std)
+        z = pdf.rsample()
+        reconstructed = self.decoder(z)
 
-        return self.decoder(z)
-
+        if return_kl:
+            kl = 0.5 * (std ** 2 + mu.pow(2) - 1 - torch.log(std ** 2)).sum(dim=1).mean(dim=0)
+            return reconstructed, kl
+        return reconstructed
 
 class LogNormalVAE(VAE):
     pass
