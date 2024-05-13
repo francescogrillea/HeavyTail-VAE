@@ -5,23 +5,28 @@ function [encoder, decoder] = buildModel(imageSize, config)
     end
        
     if ~isfield(config, "numLatentChannels")
+        fprintf("Setting default numLatenteChannels = 10.\n");
         config.numLatentChannels = 10;
     end
     if ~isfield(config, "neuronsPerLayer")
+        fprintf("Setting default neuronsPerLayer = 300.\n");
         config.neuronsPerLayer = 300;
     end
-    if ~isfield(config, "hiddenLayersEncoder")
+    if ~isfield(config, "hiddenLayersEncoder") || config.hiddenLayersEncoder < 2
+        fprintf("Setting default hiddenLayersEncoder = 3.\n");
         config.hiddenLayersEncoder = 3;
     else
         config.hiddenLayersEncoder = config.hiddenLayersEncoder - 2;
     end
-    if ~isfield(config, "hiddenLayersDecoder")
+    if ~isfield(config, "hiddenLayersDecoder") || config.hiddenLayersDecoder < 2
+        fprintf("Setting default hiddenLayersEncoder = 4.\n");
         config.hiddenLayersDecoder = 4;
     else
         config.hiddenLayersDecoder = config.hiddenLayersDecoder - 2;
     end
-    if ~isfield(config, "distribution")
-        config.distribution = "Normal";
+    if ~isfield(config, "sampleDistribution")
+        fprintf("Setting default sampleDistribution = Normal.\n");
+        config.sampleDistribution = "Normal";
     end
 
     % Encoder
@@ -38,14 +43,7 @@ function [encoder, decoder] = buildModel(imageSize, config)
         ];
     end
     
-    if strcmp(config.distribution, "Normal") == 1
-        samplingLayer = normalSamplingLayer;
-    elseif strcmp(config.distribution, "LogNormal") == 1
-        samplingLayer = logNormalSamplingLayer; 
-    else
-        fprintf("No distribution named %s. Using Normal.\n", confnig.distribution)
-        samplingLayer = normalSamplingLayer;
-    end
+    samplingLayer = setSamplingLayer(config.sampleDistribution);
 
     layersE = [layersE
         fullyConnectedLayer(config.numLatentChannels*2, Name="eOutputLayer")
@@ -76,5 +74,18 @@ function [encoder, decoder] = buildModel(imageSize, config)
 
     encoder = dlnetwork(layersE);
     decoder = dlnetwork(layersD);
+
+end
+
+function samplingLayer = setSamplingLayer(distr)
+    
+    if strcmp(distr, "Normal") == 1
+        samplingLayer = normalSamplingLayer;
+    elseif strcmp(distr, "LogNormal") == 1
+        samplingLayer = logNormalSamplingLayer; 
+    else
+        fprintf("No distribution named %s. Using Normal.\n", distr);
+        samplingLayer = normalSamplingLayer;
+    end
 
 end
