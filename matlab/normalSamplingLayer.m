@@ -18,7 +18,9 @@ classdef normalSamplingLayer < nnet.layer.Layer
             layer.Description = "Mean and log-variance normal sampling";
             layer.OutputNames = ["out" "mean" "log-variance"];
         end
+    end
 
+    methods(Static)
         function [Z,mu,logSigmaSq] = predict(~,X)
             % [Z,mu,logSigmaSq] = predict(~,Z) Forwards input data through
             % the layer at prediction and training time and output the
