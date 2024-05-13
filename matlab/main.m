@@ -4,7 +4,7 @@ config.numLatentChannels = 10;
 config.neuronsPerLayer = 300;
 config.hiddenLayersEncoder = 3;
 config.hiddenLayersDecoder = 4;
-config.distribution = "LogNormal";
+config.sampleDistribution = "LogNormal";
 
 
 % Load Dataset
@@ -20,6 +20,7 @@ imageSize = sizeXTrain(1:end-1);
 [netE, netD] = buildModel(imageSize, config);
 
 % Train Model
+[netE, netD] = train(netE, netD, XTrain, config);
 
-
-% Evaluate Model
+% Test Model
+test(netE, netD, config.numLatentChannels, XTest(:,:,:,1:5));
