@@ -14,7 +14,7 @@ classdef normalSamplingLayer < nnet.layer.Layer
 
             % Layer properties.
             layer.Name = args.Name;
-            layer.Type = "Sampling";
+            layer.Type = "NormalSampling";
             layer.Description = "Mean and log-variance normal sampling";
             layer.OutputNames = ["out" "mean" "log-variance"];
         end
