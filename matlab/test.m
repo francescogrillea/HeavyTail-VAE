@@ -2,8 +2,8 @@ function test(netE, netD, numLatentChannels, XTest)
 % Generate a batch of new images by passing randomly sampled image encodings through the decoder.
 numImages = 64;
 
-samplingFunction = netE.Layers(end);
-samplingFunction = @(X) samplingFunction.predict("", X);
+samplingLayer = netE.Layers(end);
+samplingFunction = @(X) samplingLayer.predict("", X);
 
 ZNew = randn(numLatentChannels*2, numImages);
 ZNew = samplingFunction(ZNew);
@@ -24,9 +24,6 @@ numTestImages = size(XTest, 4);
 
 figure
 tiledlayout(numTestImages, 2);
-
-imageSize = size(XTest);
-imageSize = imageSize(1:end-1);
 
 XTest = dlarray(XTest, "SSCB");
 for i = 1:numTestImages
