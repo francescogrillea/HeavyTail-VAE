@@ -1,3 +1,5 @@
+clc; clear;
+
 % Config
 config = struct;
 config.numLatentChannels = 10;
