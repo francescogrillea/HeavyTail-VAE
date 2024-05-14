@@ -24,7 +24,7 @@ imageSize = sizeXTrain(1:end-1);
 [netE, netD] = buildModel(imageSize, config);
 
 % Train Model
-% [netE, netD] = train(netE, netD, XTrain, config);
+[netE, netD] = train(netE, netD, XTrain, config);
 
 saveStatistics(config);
 dumpModel(config, netE, netD);
