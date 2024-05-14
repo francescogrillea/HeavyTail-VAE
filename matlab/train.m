@@ -89,7 +89,7 @@ while epoch < config.numEpochs && ~monitor.Stop
             monitor.Progress = 100*iteration/numIterations;
         end
     end
-
+    config.loss = loss;
     toc
 end
 
