@@ -1,8 +1,8 @@
 classdef positiveEluLayer < nnet.layer.Layer
 
     methods
-        function layer = normalSamplingLayer(args)
-            % layer = normalSamplingLayer creates a sampling layer for VAEs.
+        function layer = positiveEluLayer(args)
+            % layer = positiveEluLayer creates a shifted ELU activation layer.
             %
             % layer = samplingLayer(Name=name) also specifies the layer 
             % name.
@@ -14,9 +14,10 @@ classdef positiveEluLayer < nnet.layer.Layer
 
             % Layer properties.
             layer.Name = args.Name;
-            layer.Type = "NormalSampling";
-            layer.Description = "Mean and log-variance normal sampling";
-            layer.OutputNames = ["out" "mean" "log-variance"];
+            layer.Type = "EluLayer";
+            layer.Description = "Shifted ELU activation layer";
+            layer.OutputNames = "out";
+            layer.NumOutputs = 1;
         end
     
         function Z = predict(~,X)

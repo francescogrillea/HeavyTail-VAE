@@ -34,12 +34,15 @@ function [encoder, decoder] = buildModel(imageSize, config)
     % end
 
     % Encoder
+    % Set sampling layer
+    samplingLayer = feval(config.samplingLayer, Name="SamplingLayer");
+    
     layersE = [
         imageInputLayer(imageSize, Normalization="rescale-zero-one")
     ];
     for i=1:config.encoder.nHidden
         if i == config.encoder.nHidden
-            neurons = config.numLatentChannels;
+            neurons = (samplingLayer.NumOutputs-1) * config.numLatentChannels;
         else
             neurons = config.encoder.layers(i).neurons;
         end
@@ -49,8 +52,6 @@ function [encoder, decoder] = buildModel(imageSize, config)
             leakyReluLayer(0.01)
         ];
     end
-    % add sampling layer
-    samplingLayer = feval(config.samplingLayer, Name="SamplingLayer");
     layersE = [layersE
         samplingLayer
     ];

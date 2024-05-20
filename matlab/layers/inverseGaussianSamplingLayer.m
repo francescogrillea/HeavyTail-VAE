@@ -17,6 +17,7 @@ classdef inverseGaussianSamplingLayer < nnet.layer.Layer
             layer.Type = "InverseGaussianSampling";
             layer.Description = "Mean and shape inverse gaussian sampling";
             layer.OutputNames = ["out" "mean" "shape"];
+            layer.NumOutputs = 3;
         end
     
         function [Z, mu, shape] = predict(~,X)

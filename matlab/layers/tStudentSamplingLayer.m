@@ -17,6 +17,7 @@ classdef tStudentSamplingLayer < nnet.layer.Layer
             layer.Type = "TStudentSampling";
             layer.Description = "DoF t-Student sampling";
             layer.OutputNames = ["out" "DoF"];
+            layer.NumOutputs = 2;
         end
     
         function [Z, DoF] = predict(~,X)

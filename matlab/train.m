@@ -82,9 +82,6 @@ while epoch < config.numEpochs && ~monitor.Stop
         [netD, trailingAvgD, trailingAvgSqD] = adamupdate(netD, ...
             gradientsD, trailingAvgD, trailingAvgSqD, iteration, config.learningRate);
 
-        fprintf("InNaN: %d\n", any(isnan(gradientsE.Value{1}(1,:))));
-        pause(0.2)
-
         if config.plotLoss
             % Update the training progress monitor.
             recordMetrics(monitor, iteration, Loss=loss);
