@@ -1,0 +1,71 @@
+[
+    {
+        "numLatentChannels": 10,
+        "samplingLayer": "normalSamplingLayer",
+        "encoder": {
+            "nHidden": 3,
+            "layers": [
+                {
+                    "layerType": "fullyConnectedLayer",
+                    "neurons": 300
+                },
+                {
+                    "layerType": "fullyConnectedLayer",
+                    "neurons": 300
+                },
+                {
+                    "layerType": "fullyConnectedLayer",
+                    "neurons": 300
+                }
+            ]    
+        },
+        "decoder": {
+            "nHidden": 4,
+            "layers": [
+                {
+                    "layerType": "fullyConnectedLayer",
+                    "neurons": 300
+                },
+                {
+                    "layerType": "fullyConnectedLayer",
+                    "neurons": 300
+                },
+                {
+                    "layerType": "fullyConnectedLayer",
+                    "neurons": 300
+                },
+                {
+                    "layerType": "fullyConnectedLayer",
+                    "neurons": 300
+                }
+            ]    
+        },
+        "numEpochs": 10,
+        "learningRete": 1e-5,
+        "batchSize": 12,
+        "plotLoss": true
+    },
+
+    {
+        "numLatentChannels": 10,
+        "samplingLayer": "Normal",
+        "encoder": {
+                "layerType": "fullyConnectedLayer",
+                "nHidden": 3,
+                "neuronsPerLayer": 300
+        },
+        "decoder": {
+            "layerType": "fullyConnectedLayer",
+            "nHidden": 3,
+            "neuronsPerLayer": 300
+        },
+        
+        "numEpochs": 10,
+        "learningRete": 1e-5,
+        "batchSize": 12,
+
+        "plotLoss": true
+    }
+
+]
+  

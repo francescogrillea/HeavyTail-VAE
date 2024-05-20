@@ -1,18 +1,7 @@
 clc; clear;
 
-% Config
-config = struct;
-config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
-config.numLatentChannels = 10;
-config.neuronsPerLayer = 300;
-config.hiddenLayersEncoder = 3;
-config.hiddenLayersDecoder = 4;
-config.sampleDistribution = "LogNormal";
-config.numEpochs = 10;
-config.learningRate = 1e-5;
-config.batchSize = 12;
-config.plotLoss = true;
-
+profile off
+profile on
 
 % Load Dataset
 dataset = load('mnist.mat');
@@ -23,19 +12,49 @@ XTest = reshape(dataset.test.images, 28,28,1,[]);
 sizeXTrain = size(XTrain);
 imageSize = sizeXTrain(1:end-1);
 
-% Build Model
-[netE, netD] = buildModel(imageSize, config);
+% iterate through different configs
+configs = read_config("config.json");
+n_configs = size(configs, 1);
+for i=1:n_configs
+    config = configs(i);
+    config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
 
-% Train Model
-[netE, netD] = train(netE, netD, XTrain, config);
+    % Build Model
+    [netE, netD] = buildModel(imageSize, config);
 
-saveStatistics(config);
-dumpModel(config, netE, netD);
+    % Train Model
+    [netE, netD] = train(netE, netD, XTrain, config);
+    
+    saveStatistics(config);
+    dumpModel(config, netE, netD);
+    
+    % Test Model
+    % test(netE, netD, config.numLatentChannels, XTest(:,:,:,1:5));
 
-% Test Model
-% test(netE, netD, config.numLatentChannels, XTest(:,:,:,1:5));
+end
 
 
+
+%%% ======= UTILITY FUNCTIONS ======= %%%
+
+% read config file
+function config = read_config(filename)
+    % Check if the file exists
+    if exist(filename, 'file') ~= 2
+        error('File not found: %s', filename);
+    end
+    
+    % Read the JSON file
+    fid = fopen(filename, 'r');
+    raw = fread(fid, inf);
+    str = char(raw');
+    fclose(fid);
+    
+    % Parse the JSON string into a MATLAB structure
+    config = jsondecode(str);
+end
+
+% save config statistics to disk
 function [] = saveStatistics(config)
     stats_filename = "statistics.csv";
     if exist(stats_filename, 'file') == 0
@@ -56,6 +75,7 @@ function [] = saveStatistics(config)
     fclose(fid);
 end
 
+% save trained model to disk
 function [] = dumpModel(config, netE, netD)
     % TODO - add loss plot
     baseFolder = "model_dumps";  

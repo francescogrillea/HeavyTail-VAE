@@ -1,52 +1,60 @@
 function [encoder, decoder] = buildModel(imageSize, config)
 
+    % default config parameters
+    DEFAULT_N_LATENT_CHANNELS = 10;
+
     if nargin < 2
         config = struct;
     end
        
     if ~isfield(config, "numLatentChannels")
-        fprintf("Setting default numLatenteChannels = 10.\n");
+        fprintf("Setting default numLatenteChannels = %.\n", DEFAULT_N_LATENT_CHANNELS);
         config.numLatentChannels = 10;
     end
-    if ~isfield(config, "neuronsPerLayer")
-        fprintf("Setting default neuronsPerLayer = 300.\n");
-        config.neuronsPerLayer = 300;
-    end
-    if ~isfield(config, "hiddenLayersEncoder") || config.hiddenLayersEncoder < 2
-        fprintf("Setting default hiddenLayersEncoder = 3.\n");
-        config.hiddenLayersEncoder = 3;
-    else
-        config.hiddenLayersEncoder = config.hiddenLayersEncoder - 2;
-    end
-    if ~isfield(config, "hiddenLayersDecoder") || config.hiddenLayersDecoder < 2
-        fprintf("Setting default hiddenLayersEncoder = 4.\n");
-        config.hiddenLayersDecoder = 4;
-    else
-        config.hiddenLayersDecoder = config.hiddenLayersDecoder - 2;
-    end
-    if ~isfield(config, "sampleDistribution")
-        fprintf("Setting default sampleDistribution = Normal.\n");
-        config.sampleDistribution = "Normal";
-    end
+
+
+
+    % if ~isfield(config, "neuronsPerLayer")
+    %     fprintf("Setting default neuronsPerLayer = 300.\n");
+    %     config.neuronsPerLayer = 300;
+    % end
+    % if ~isfield(config, "hiddenLayersEncoder") || config.hiddenLayersEncoder < 2
+    %     fprintf("Setting default hiddenLayersEncoder = 3.\n");
+    %     config.hiddenLayersEncoder = 3;
+    % else
+    %     config.hiddenLayersEncoder = config.hiddenLayersEncoder - 2;
+    % end
+    % if ~isfield(config, "hiddenLayersDecoder") || config.hiddenLayersDecoder < 2
+    %     fprintf("Setting default hiddenLayersEncoder = 4.\n");
+    %     config.hiddenLayersDecoder = 4;
+    % else
+    %     config.hiddenLayersDecoder = config.hiddenLayersDecoder - 2;
+    % end
+    % if ~isfield(config, "sampleDistribution")
+    %     fprintf("Setting default sampleDistribution = Normal.\n");
+    %     config.sampleDistribution = "Normal";
+    % end
 
     % Encoder
     layersE = [
         imageInputLayer(imageSize, Normalization="rescale-zero-one")
-        fullyConnectedLayer(config.neuronsPerLayer, Name="eInputLayer")
-        leakyReluLayer(0.01)
-    ];    
-    for i=1:config.hiddenLayersEncoder
+    ];
+    for i=1:config.encoder.nHidden
+        if i == config.encoder.nHidden 
+            neurons = config.numLatentChannels;
+        else
+            neurons = config.encoder.layers(i).neurons;
+        end
+        layerType = feval(config.encoder.layers(i).layerType, neurons, Name="eLayer"+i);
         layersE = [
             layersE
-            fullyConnectedLayer(config.neuronsPerLayer, Name="eHidden"+i)
+            layerType
             leakyReluLayer(0.01)
         ];
     end
-    
-    samplingLayer = setSamplingLayer(config.sampleDistribution);
-
+    % add sampling layer
+    samplingLayer = feval(config.samplingLayer, Name="SamplingLayer");
     layersE = [layersE
-        fullyConnectedLayer(config.numLatentChannels*2, Name="eOutputLayer")
         samplingLayer
     ];
 
@@ -54,38 +62,29 @@ function [encoder, decoder] = buildModel(imageSize, config)
     % Decoder
     layersD = [
         featureInputLayer(config.numLatentChannels)
-        fullyConnectedLayer(config.neuronsPerLayer, Name="dInputLayer")
-        leakyReluLayer(0.01)
     ];
-    for i=1:config.hiddenLayersDecoder
+    for i=1:config.decoder.nHidden
+        if i == config.decoder.nHidden
+            neurons = prod(imageSize);
+            activation = sigmoidLayer;
+        else
+            neurons = config.decoder.layers(i).neurons;
+            activation = leakyReluLayer(0.01);
+        end
+        layerType = feval(config.decoder.layers(i).layerType, neurons, Name="dLayer"+i);
         layersD = [
             layersD
-            fullyConnectedLayer(config.neuronsPerLayer, Name="dHidden"+i)
-            leakyReluLayer(0.01)
+            layerType
+            activation
         ];
     end
-    
+
     layersD = [
         layersD
-        fullyConnectedLayer(prod(imageSize), Name="dOutputLayer")
-        sigmoidLayer
         reshapeLayer(imageSize)
     ];
 
     encoder = dlnetwork(layersE);
     decoder = dlnetwork(layersD);
-
-end
-
-function samplingLayer = setSamplingLayer(distr)
-    
-    if strcmp(distr, "Normal") == 1
-        samplingLayer = normalSamplingLayer;
-    elseif strcmp(distr, "LogNormal") == 1
-        samplingLayer = logNormalSamplingLayer; 
-    else
-        fprintf("No distribution named %s. Using Normal.\n", distr);
-        samplingLayer = normalSamplingLayer;
-    end
 
 end
