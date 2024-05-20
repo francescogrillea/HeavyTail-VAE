@@ -46,7 +46,6 @@ classdef normalSamplingLayer < nnet.layer.Layer
             epsilon = randn(numLatentChannels,miniBatchSize,"like",X);
             sigma = exp(.5 * logSigmaSq);
             Z = epsilon .* sigma + mu;
-        
         end
 
     end

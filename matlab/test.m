@@ -3,7 +3,7 @@ function test(netE, netD, numLatentChannels, XTest)
 numImages = 64;
 
 samplingLayer = netE.Layers(end);
-samplingFunction = @(X) samplingLayer.predict("", X);
+samplingFunction = @(X) samplingLayer.predict(X);
 
 ZNew = randn(numLatentChannels*2, numImages);
 ZNew = samplingFunction(ZNew);

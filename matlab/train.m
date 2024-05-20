@@ -82,6 +82,9 @@ while epoch < config.numEpochs && ~monitor.Stop
         [netD, trailingAvgD, trailingAvgSqD] = adamupdate(netD, ...
             gradientsD, trailingAvgD, trailingAvgSqD, iteration, config.learningRate);
 
+        fprintf("InNaN: %d\n", any(isnan(gradientsE.Value{1}(1,:))));
+        pause(0.2)
+
         if config.plotLoss
             % Update the training progress monitor.
             recordMetrics(monitor, iteration, Loss=loss);
@@ -96,7 +99,8 @@ end
 
 function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X)
     % Forward through encoder.
-    [Z, mu, logSigmaSq] = forward(netE, X);
+    % [Z, mu, logSigmaSq] = forward(netE, X);
+    [Z, DoF] = forward(netE, X);
     
     % Forward through decoder.
     Y = forward(netD, Z);
@@ -104,10 +108,10 @@ function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X)
     % Calculate loss and gradients.
     reconstructionLoss = mse(Y, X);
     
-    KL = -0.5 * sum(1 + logSigmaSq - mu.^2 - exp(logSigmaSq), 1);
-    KL = mean(KL);
+    % KL = -0.5 * sum(1 + logSigmaSq - mu.^2 - exp(logSigmaSq), 1);
+    % KL = mean(KL);
     
-    loss = reconstructionLoss + KL;
+    loss = reconstructionLoss;% + KL;
     
     [gradientsE,gradientsD] = dlgradient(loss, netE.Learnables, netD.Learnables);
 end

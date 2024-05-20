@@ -24,13 +24,12 @@ for i=1:n_configs
 
     % Train Model
     [netE, netD] = train(netE, netD, XTrain, config);
-    
+
     saveStatistics(config);
     dumpModel(config, netE, netD);
-    
+
     % Test Model
     % test(netE, netD, config.numLatentChannels, XTest(:,:,:,1:5));
-
 end
 
 
@@ -43,13 +42,13 @@ function config = read_config(filename)
     if exist(filename, 'file') ~= 2
         error('File not found: %s', filename);
     end
-    
+
     % Read the JSON file
     fid = fopen(filename, 'r');
     raw = fread(fid, inf);
     str = char(raw');
     fclose(fid);
-    
+
     % Parse the JSON string into a MATLAB structure
     config = jsondecode(str);
 end

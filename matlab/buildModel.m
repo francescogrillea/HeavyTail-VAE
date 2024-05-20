@@ -12,8 +12,6 @@ function [encoder, decoder] = buildModel(imageSize, config)
         config.numLatentChannels = 10;
     end
 
-
-
     % if ~isfield(config, "neuronsPerLayer")
     %     fprintf("Setting default neuronsPerLayer = 300.\n");
     %     config.neuronsPerLayer = 300;
@@ -40,14 +38,13 @@ function [encoder, decoder] = buildModel(imageSize, config)
         imageInputLayer(imageSize, Normalization="rescale-zero-one")
     ];
     for i=1:config.encoder.nHidden
-        if i == config.encoder.nHidden 
+        if i == config.encoder.nHidden
             neurons = config.numLatentChannels;
         else
             neurons = config.encoder.layers(i).neurons;
         end
         layerType = feval(config.encoder.layers(i).layerType, neurons, Name="eLayer"+i);
-        layersE = [
-            layersE
+        layersE = [layersE
             layerType
             leakyReluLayer(0.01)
         ];
