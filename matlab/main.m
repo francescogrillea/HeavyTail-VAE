@@ -8,7 +8,10 @@ config.neuronsPerLayer = 300;
 config.hiddenLayersEncoder = 3;
 config.hiddenLayersDecoder = 4;
 config.sampleDistribution = "LogNormal";
-config.numEpochs = 1;
+config.numEpochs = 10;
+config.learningRate = 1e-5;
+config.batchSize = 12;
+config.plotLoss = true;
 
 
 % Load Dataset
@@ -30,7 +33,7 @@ saveStatistics(config);
 dumpModel(config, netE, netD);
 
 % Test Model
-test(netE, netD, config.numLatentChannels, XTest(:,:,:,1:5));
+% test(netE, netD, config.numLatentChannels, XTest(:,:,:,1:5));
 
 
 function [] = saveStatistics(config)
