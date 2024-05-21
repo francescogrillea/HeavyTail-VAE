@@ -1,4 +1,4 @@
-function [netE, netD] = train(netE, netD, XTrain, config)
+function [netE, netD, stats] = train(netE, netD, XTrain, config)
 
 DEFAULT_NUMEPOCHS = 3;
 DEFAULT_BATCHSIZE = 32;
@@ -16,11 +16,11 @@ end
 if ~isfield(config, "batchSize")
     config.batchSize = DEFAULT_BATCHSIZE;
 end
-if ~isfield(config, "plotLoss")
-    config.plotLoss = false;
+if ~isfield(config, "interactiveLoss")
+    config.interactiveLoss = false;
 end
 
-if config.plotLoss
+if config.interactiveLoss
     % Calculate the total number of iterations for the training progress monitor
     numObservationsTrain = size(XTrain,4);
     numIterationsPerEpoch = ceil(numObservationsTrain / config.batchSize);
@@ -52,15 +52,17 @@ trailingAvgSqE = [];
 trailingAvgD = [];
 trailingAvgSqD = [];
 
-
+stats = struct;
 epoch = 0;
 iteration = 0;
+epochTimes = [];
+lossHistory = [];
 
 % Loop over epochs.
 while epoch < config.numEpochs && ~monitor.Stop
-    tic
+    tic;
     epoch = epoch + 1;
-    fprintf("Epoch %d\n", epoch);
+    % fprintf("Epoch %d\n", epoch);
 
     % Shuffle data.
     shuffle(mbq);
@@ -82,16 +84,22 @@ while epoch < config.numEpochs && ~monitor.Stop
         [netD, trailingAvgD, trailingAvgSqD] = adamupdate(netD, ...
             gradientsD, trailingAvgD, trailingAvgSqD, iteration, config.learningRate);
 
-        if config.plotLoss
+        if config.interactiveLoss
             % Update the training progress monitor.
             recordMetrics(monitor, iteration, Loss=loss);
             updateInfo(monitor, Epoch=epoch + " of " + config.numEpochs);
             monitor.Progress = 100*iteration/numIterations;
         end
+        lossHistory = [lossHistory, loss];
     end
-    config.loss = loss;
-    toc
+    stats.finalLoss = loss;
+    elapsedTime = toc;
+    fprintf("Epoch %d\tcompleted in %.4fs\n", epoch, elapsedTime);
+    epochTimes = [epochTimes, elapsedTime];
+
 end
+stats.avgEpochTime = mean(epochTimes);
+stats.lossHistory = lossHistory;
 
 
 function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X)

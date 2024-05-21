@@ -1,7 +1,7 @@
 [
     {
         "numLatentChannels": 10,
-        "samplingLayer": "normalSamplingLayer",
+        "samplingLayer": "logNormalSamplingLayer",
         "encoder": {
             "nHidden": 3,
             "layers": [
@@ -40,31 +40,10 @@
                 }
             ]    
         },
-        "numEpochs": 10,
-        "learningRete": 1e-5,
-        "batchSize": 12,
-        "plotLoss": true
-    },
-
-    {
-        "numLatentChannels": 10,
-        "samplingLayer": "Normal",
-        "encoder": {
-                "layerType": "fullyConnectedLayer",
-                "nHidden": 3,
-                "neuronsPerLayer": 300
-        },
-        "decoder": {
-            "layerType": "fullyConnectedLayer",
-            "nHidden": 3,
-            "neuronsPerLayer": 300
-        },
-        
-        "numEpochs": 10,
-        "learningRete": 1e-5,
-        "batchSize": 12,
-
-        "plotLoss": true
+        "numEpochs": 1,
+        "learningRate": 1e-5,
+        "batchSize": 512,
+        "plotLoss": false
     }
 
 ]
