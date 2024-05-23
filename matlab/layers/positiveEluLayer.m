@@ -29,8 +29,11 @@ classdef positiveEluLayer < nnet.layer.Layer
             % Outputs:
             %         Z - 1 + elu(x-1)
     
-            Z = exp(X).*(X<0) + (X+1).*(X>=0);
-            % Z = (exp(X-1)).*(X<1) + X.*(X>=1)   --- not working
+            Z = dlarray(zeros(size(X)));
+            Z(X<0) = exp(X(X<0));
+            Z(X>=0) = X(X>=0) + 1;
+            
+            % Z = (exp(X-1)).*(X<1) + X.*(X>=1); %  --- not working
         end
 
     end
