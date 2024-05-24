@@ -12,6 +12,7 @@ pd = @(mu, sigma)lognrnd(mu, sigma, n, 1);
 d1 = generate_samples(pd, mu(1,:), sigma(1,:));
 
 d1 = [d1, zeros(n, 1)];
+fig = figure;
 scatter(d1(:, 1), d1(:, 2), "filled", "r");
 hold on
 
@@ -24,6 +25,8 @@ out = [d1; d2];
 
 indexes = randperm(2*n);
 out = out(indexes, :);
-dataset_filepath = sprintf("datasets/lognorm.mat");
-save(dataset_filepath, "out");
+dataset_basepath = "datasets";
+dataset_filename = "lognorm";
+save(sprintf("%s/%s.mat", dataset_basepath, dataset_filename), "out");
+saveas(fig, sprintf("%s/%s.png", dataset_basepath, dataset_filename));
 
