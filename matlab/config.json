@@ -1,8 +1,92 @@
 [
     {
+        "dataset": "lognorm",
+        "inputSize": [2],
+        "batchFormat": "CB",
+        "numLatentChannels": 2,
+        "numDistributionParameters": 2,
+        "numEpochs": 3,
+        "learningRate": 1e-4,
+        "batchSize": 100,
+        "plotLoss": false,
+        "interactiveLoss": true,
+        "encoder": [
+            {
+                "layerType": "featureInputLayer",
+                "defaultArg": 2
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 10
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 10
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": "config.numLatentChannels * config.numDistributionParameters"
+            },
+            {
+                "layerType": "logNormalSamplingLayer"
+            }
+        ],
+        "decoder": [
+            {
+                "layerType": "featureInputLayer",
+                "defaultArg": "config.numLatentChannels"
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 10
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 10
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 10
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": "prod(config.inputSize)"
+            },
+            {
+                "layerType": "sigmoidLayer"
+            }
+        ]
+    },
+    {
+        "dataset": "mnist",
         "inputSize": [28, 28, 1],
         "numLatentChannels": 10,
         "numDistributionParameters": 2,
+        "numEpochs": 10,
+        "learningRate": 3e-4,
+        "batchSize": 512,
+        "batchFormat": "SSCB",
+        "plotLoss": true,
         "encoder": [
             {
                 "layerType": "imageInputLayer",
@@ -76,12 +160,7 @@
                 "layerType": "reshapeLayer",
                 "defaultArg": "config.inputSize"
             }
-        ],
-        "numEpochs": 10,
-        "learningRate": 3e-4,
-        "batchSize": 512,
-        "plotLoss": true
+        ]
     }
-
 ]
   

@@ -2,21 +2,18 @@ addpath("layers")
 
 clc; clear;
 
-% Load Dataset
-dataset = load('mnist.mat');
-
-XTrain = reshape(dataset.training.images, 28,28,1,[]);
-XTest = reshape(dataset.test.images, 28,28,1,[]);
-
-sizeXTrain = size(XTrain);
-imageSize = sizeXTrain(1:end-1);
-
 % iterate through different configs
 configs = read_config("config.json");
 n_configs = size(configs, 1);
 for i=1:n_configs
     config = configs(i);
+    if n_configs > 1
+        config = config{1};
+    end
     config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
+
+    % Load Dataset
+    XTrain = loadDataset(config.dataset);
 
     % Build Model
     [netE, netD] = buildModel(config);
@@ -58,10 +55,11 @@ function stats = generateStatistics(config, trainStats)
     
     stats = struct;
     stats.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
-    stats.samplingLayer = config.samplingLayer;
+
+    stats.samplingLayer = config.encoder{end}.layerType;
     stats.numLatentChannels = config.numLatentChannels;
-    stats.numEncoderLayers = config.encoder.nHidden;
-    stats.numDecoderLayers = config.decoder.nHidden;
+    stats.numEncoderLayers = countLayers(config.encoder);
+    stats.numDecoderLayers = countLayers(config.decoder);
 
     stats.numEpochs =  config.numEpochs;
     stats.learningRate = config.learningRate;
@@ -73,6 +71,15 @@ function stats = generateStatistics(config, trainStats)
     stats.avgEpochTime = trainStats.avgEpochTime;
     stats.finalLoss = trainStats.finalLoss;  
     
+    function n = countLayers(net)
+        n = 0;
+        for i = 1:length(net)
+            layer = net{i};
+            if strcmp(layer.layerType, "fullyConnectedLayer")
+                n = n+1;
+            end
+        end
+    end
 end
 
 
@@ -98,7 +105,7 @@ function [] = saveStatistics(stats)
 end
 
 % save trained model to disk
-function [] = dumpModel(config, trainStats, netE, netD)
+function dumpModel(config, trainStats, netE, netD)
     baseFolder = "model_dumps";  
     if exist(baseFolder, 'dir') == 0
         mkdir(baseFolder);
@@ -122,4 +129,18 @@ function [] = dumpModel(config, trainStats, netE, netD)
     save(model_filename, "netE", "netD");
     lossHistory = trainStats.lossHistory;
     save(loss_filename, "lossHistory");
+end
+
+function trainingSet = loadDataset(dataset)
+    datasetStruct = load(sprintf("datasets/%s.mat", dataset));
+
+    if strcmp(dataset, 'mnist')
+        trainingSet = reshape(datasetStruct.training.images, 28, 28, 1, []);
+        % trainingSet = dlarray(trainingSet, "SSCB");
+    elseif strcmp(dataset, 'lognorm')
+        trainingSet = datasetStruct.out(:,1:2)';
+        % trainingSet = dlarray(trainingSet, "SB");
+    else
+        error("Dataset not supported")
+    end
 end

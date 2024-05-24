@@ -1,28 +1,18 @@
 function [netE, netD, stats] = train(netE, netD, XTrain, config)
 
-DEFAULT_NUMEPOCHS = 3;
-DEFAULT_BATCHSIZE = 32;
-DEFAULT_LEARNINGRATE = 1e-3;
-
 if nargin < 4
-    config = struct;
+    error("Must provide a config")
 end
-if ~isfield(config, "numEpochs")
-    config.numEpochs = DEFAULT_NUMEPOCHS;
-end
-if ~isfield(config, "learningRate")
-    config.learningRate = DEFAULT_LEARNINGRATE;
-end
-if ~isfield(config, "batchSize")
-    config.batchSize = DEFAULT_BATCHSIZE;
-end
+
 if ~isfield(config, "interactiveLoss")
     config.interactiveLoss = false;
 end
 
+batchDimension = length(config.inputSize) + 1;
+
 if config.interactiveLoss
     % Calculate the total number of iterations for the training progress monitor
-    numObservationsTrain = size(XTrain,4);
+    numObservationsTrain = size(XTrain, batchDimension);
     numIterationsPerEpoch = ceil(numObservationsTrain / config.batchSize);
     numIterations = config.numEpochs * numIterationsPerEpoch;
 
@@ -37,13 +27,13 @@ end
 
 
 % Create a minibatchqueue object that processes and manages mini-batches of images during training
-dsTrain = arrayDatastore(XTrain, IterationDimension=4);
+dsTrain = arrayDatastore(XTrain, IterationDimension=batchDimension);
 numOutputs = 1;
 
 mbq = minibatchqueue(dsTrain, numOutputs, ...
     MiniBatchSize = config.batchSize, ...
-    MiniBatchFcn=@(dataX) cat(4, dataX{:}), ...
-    MiniBatchFormat="SSCB");
+    MiniBatchFcn=@(dataX) cat(batchDimension, dataX{:}), ...
+    MiniBatchFormat=config.batchFormat);
 
 
 % Initialize the parameters for the Adam solver.
@@ -105,7 +95,7 @@ stats.lossHistory = lossHistory;
 function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X)
     % Forward through encoder.
     % [Z, mu, logSigmaSq] = forward(netE, X);
-    [Z, DoF] = forward(netE, X);
+    Z = forward(netE, X);
     
     % Forward through decoder.
     Y = forward(netD, Z);
