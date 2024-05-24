@@ -2,9 +2,6 @@ addpath("layers")
 
 clc; clear;
 
-profile off
-profile on
-
 % Load Dataset
 dataset = load('mnist.mat');
 
@@ -22,7 +19,7 @@ for i=1:n_configs
     config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
 
     % Build Model
-    [netE, netD] = buildModel(imageSize, config);
+    [netE, netD] = buildModel(config);
 
     % Train Model
     [netE, netD, trainStats] = train(netE, netD, XTrain, config);
@@ -120,6 +117,9 @@ function [] = dumpModel(config, trainStats, netE, netD)
     saveas(fig, plot_filename);
 
     model_filename = sprintf("%s/model.mat", modelFolder);
+    loss_filename = sprintf("%s/loss.mat", modelFolder);
     
     save(model_filename, "netE", "netD");
+    lossHistory = trainStats.lossHistory;
+    save(loss_filename, "lossHistory");
 end

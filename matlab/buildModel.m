@@ -1,88 +1,63 @@
-function [encoder, decoder] = buildModel(imageSize, config)
+function [encoder, decoder] = buildModel(config)
 
-    % default config parameters
-    DEFAULT_N_LATENT_CHANNELS = 10;
-
-    if nargin < 2
-        config = struct;
+    if nargin < 1
+        error("Must provide a config of the network");
     end
-       
-    if ~isfield(config, "numLatentChannels")
-        fprintf("Setting default numLatenteChannels = %.\n", DEFAULT_N_LATENT_CHANNELS);
-        config.numLatentChannels = 10;
-    end
-
-    % if ~isfield(config, "neuronsPerLayer")
-    %     fprintf("Setting default neuronsPerLayer = 300.\n");
-    %     config.neuronsPerLayer = 300;
-    % end
-    % if ~isfield(config, "hiddenLayersEncoder") || config.hiddenLayersEncoder < 2
-    %     fprintf("Setting default hiddenLayersEncoder = 3.\n");
-    %     config.hiddenLayersEncoder = 3;
-    % else
-    %     config.hiddenLayersEncoder = config.hiddenLayersEncoder - 2;
-    % end
-    % if ~isfield(config, "hiddenLayersDecoder") || config.hiddenLayersDecoder < 2
-    %     fprintf("Setting default hiddenLayersEncoder = 4.\n");
-    %     config.hiddenLayersDecoder = 4;
-    % else
-    %     config.hiddenLayersDecoder = config.hiddenLayersDecoder - 2;
-    % end
-    % if ~isfield(config, "sampleDistribution")
-    %     fprintf("Setting default sampleDistribution = Normal.\n");
-    %     config.sampleDistribution = "Normal";
-    % end
+    
+    config.inputSize = reshape(config.inputSize, 1, []);
 
     % Encoder
-    % Set sampling layer
-    samplingLayer = feval(config.samplingLayer, Name="SamplingLayer");
-    
-    layersE = [
-        imageInputLayer(imageSize, Normalization="rescale-zero-one")
-    ];
-    for i=1:config.encoder.nHidden
-        if i == config.encoder.nHidden
-            neurons = (samplingLayer.NumOutputs-1) * config.numLatentChannels;
-        else
-            neurons = config.encoder.layers(i).neurons;
-        end
-        layerType = feval(config.encoder.layers(i).layerType, neurons, Name="eLayer"+i);
+    layersE = [];
+
+    for i = 1:length(config.encoder)
+        layerConfig = config.encoder{i};
         layersE = [layersE
-            layerType
-            leakyReluLayer(0.01)
+            buildLayer(layerConfig);
         ];
     end
-    layersE = [layersE
-        samplingLayer
-    ];
-
 
     % Decoder
-    layersD = [
-        featureInputLayer(config.numLatentChannels)
-    ];
-    for i=1:config.decoder.nHidden
-        if i == config.decoder.nHidden
-            neurons = prod(imageSize);
-            activation = sigmoidLayer;
-        else
-            neurons = config.decoder.layers(i).neurons;
-            activation = leakyReluLayer(0.01);
-        end
-        layerType = feval(config.decoder.layers(i).layerType, neurons, Name="dLayer"+i);
-        layersD = [
-            layersD
-            layerType
-            activation
+    layersD = [];
+    for i = 1:length(config.decoder)
+        layerConfig = config.decoder{i};
+        layersD = [layersD
+            buildLayer(layerConfig);
         ];
     end
-
-    layersD = [
-        layersD
-        reshapeLayer(imageSize)
-    ];
 
     encoder = dlnetwork(layersE);
     decoder = dlnetwork(layersD);
 
+    
+    function layer = buildLayer(layerConfig)
+        layerType = layerConfig.layerType;
+    
+        args = {};
+        argc = 1;
+        if isfield(layerConfig, "defaultArg")
+            if ischar(layerConfig.defaultArg)
+                args{1} = eval(layerConfig.defaultArg);
+            else
+                args{1} = layerConfig.defaultArg;
+            end
+            argc = argc + 1;
+        end
+
+        configFields = fields(layerConfig);
+        for f = 1:length(configFields)
+            field = configFields{f};
+
+            if ~strcmp(field, "layerType") && ~strcmp(field, "defaultArg")
+                args{argc} = field;
+                if ischar(layerConfig.(field))
+                    args{argc+1} = eval(layerConfig.(field));
+                else
+                    args{argc+1} = layerConfig.(field);
+                end
+                argc = argc + 2;
+            end
+        end
+
+        layer = feval(layerType, args{:}, "Name", layerType);
+    end
 end
