@@ -1,35 +1,31 @@
-function test(netE, netD, numLatentChannels, XTest)
-% Generate a batch of new images by passing randomly sampled image encodings through the decoder.
-numImages = 64;
+function test(netE, netD, XTest, labels, runID)
+    
+    chosenLabels_idx = [];
+    for i=0:9
+        all_i = find(labels == i);
+        idx = randperm(length(all_i), 1);
+        chosenLabels_idx = [chosenLabels_idx, all_i(idx)];
+    end
+    
+    XTest = XTest(:, :, :, chosenLabels_idx);
+    
+    sizeXTest = size(XTest);
+    numTestImages = size(XTest, 4);
+    
+    fig = figure;
+    tiledlayout(numTestImages, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+    
+    XTest = dlarray(XTest, "SSCB");
+    for i = 1:numTestImages
+        image = XTest(:,:,:,i);
+        % exp_image = exp(image);
+        % reconstructed = forward(netD, forward(netE, exp_image));
+        reconstructed = forward(netD, forward(netE, image));
+        % reconstructed = log(reconstructed);
+    
+        nexttile; imshow(extractdata(image));
+        nexttile; imshow(extractdata(reconstructed));
+    end
 
-samplingLayer = netE.Layers(end);
-samplingFunction = @(X) samplingLayer.predict(X);
-
-ZNew = randn(numLatentChannels*2, numImages);
-ZNew = samplingFunction(ZNew);
-ZNew = dlarray(ZNew, "CB");
-
-YNew = predict(netD, ZNew);
-YNew = extractdata(YNew);
-
-% Display the generated images in a figure.
-figure
-I = imtile(YNew);
-imshow(I)
-title("Generated Images");
-
-
-% Compare test images with their reconstruction
-numTestImages = size(XTest, 4);
-
-figure
-tiledlayout(numTestImages, 2);
-
-XTest = dlarray(XTest, "SSCB");
-for i = 1:numTestImages
-    image = XTest(:,:,:,i);
-    reconstructed = forward(netD, forward(netE, image));
-
-    nexttile; imshow(extractdata(image));
-    nexttile; imshow(extractdata(reconstructed));
-end
+    img_path = sprintf('model_dumps/%s/reconstructed_images.png', runID);
+    saveas(fig, img_path);
