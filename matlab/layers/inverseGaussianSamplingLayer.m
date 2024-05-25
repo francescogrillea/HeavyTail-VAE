@@ -51,7 +51,8 @@ classdef inverseGaussianSamplingLayer < nnet.layer.Layer
             
             mask = rand(numLatentChannels, miniBatchSize) <= (mu ./ (mu+Z));
             temp = (mu.^2) ./ Z;
-            Z(~mask) = temp(~mask);            
+            Z(~mask) = temp(~mask);
+
         end
 
     end
