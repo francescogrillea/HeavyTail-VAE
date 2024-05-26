@@ -55,6 +55,7 @@ function stats = generateStatistics(config, trainStats)
     
     stats = struct;
     stats.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
+    stats.dataset = config.dataset;
 
     stats.samplingLayer = config.encoder{end}.layerType;
     stats.numLatentChannels = config.numLatentChannels;
@@ -137,7 +138,7 @@ function trainingSet = loadDataset(dataset)
     if strcmp(dataset, 'mnist')
         trainingSet = reshape(datasetStruct.training.images, 28, 28, 1, []);
         % trainingSet = dlarray(trainingSet, "SSCB");
-    elseif strcmp(dataset, 'lognorm')
+    elseif strcmp(dataset, 'lognorm') | strcmp(dataset, "overlapping_lognorm")
         trainingSet = datasetStruct.out(:,1:2)';
         % trainingSet = dlarray(trainingSet, "SB");
     else
