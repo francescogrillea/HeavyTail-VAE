@@ -10,7 +10,7 @@ function [encoder, decoder] = buildModel(config)
     layersE = [];
 
     for i = 1:length(config.encoder)
-        layerConfig = config.encoder{i};
+        layerConfig = config.encoder(i);
         layersE = [layersE
             buildLayer(layerConfig);
         ];
@@ -19,7 +19,7 @@ function [encoder, decoder] = buildModel(config)
     % Decoder
     layersD = [];
     for i = 1:length(config.decoder)
-        layerConfig = config.decoder{i};
+        layerConfig = config.decoder(i);
         layersD = [layersD
             buildLayer(layerConfig);
         ];
@@ -34,7 +34,7 @@ function [encoder, decoder] = buildModel(config)
     
         args = {};
         argc = 1;
-        if isfield(layerConfig, "defaultArg")
+        if isfield(layerConfig, "defaultArg") && ~strcmp(layerConfig.defaultArg, "None")
             if ischar(layerConfig.defaultArg)
                 args{1} = eval(layerConfig.defaultArg);
             else

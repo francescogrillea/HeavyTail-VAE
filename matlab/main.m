@@ -7,7 +7,7 @@ configs = read_config("config.json");
 n_configs = size(configs, 1);
 for i=1:n_configs
     config = configs(i);
-    if n_configs > 1
+    if n_configs == 1
         config = config{1};
     end
     config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
@@ -57,7 +57,7 @@ function stats = generateStatistics(config, trainStats)
     stats.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
     stats.dataset = config.dataset;
 
-    stats.samplingLayer = config.encoder{end}.layerType;
+    stats.samplingLayer = config.encoder(end).layerType;
     stats.numLatentChannels = config.numLatentChannels;
     stats.numEncoderLayers = countLayers(config.encoder);
     stats.numDecoderLayers = countLayers(config.decoder);
@@ -75,7 +75,7 @@ function stats = generateStatistics(config, trainStats)
     function n = countLayers(net)
         n = 0;
         for i = 1:length(net)
-            layer = net{i};
+            layer = net(i);
             if strcmp(layer.layerType, "fullyConnectedLayer")
                 n = n+1;
             end
@@ -133,12 +133,16 @@ function dumpModel(config, trainStats, netE, netD)
 end
 
 function trainingSet = loadDataset(dataset)
-    datasetStruct = load(sprintf("datasets/%s.mat", dataset));
 
-    if strcmp(dataset, 'mnist')
+    if strcmp(dataset, 'exp_mnist')
+        datasetStruct = load("datasets/mnist.mat");
+        trainingSet = exp(reshape(datasetStruct.training.images, 28, 28, 1, []));
+    elseif strcmp(dataset, 'mnist')
+        datasetStruct = load(sprintf("datasets/%s.mat", dataset));
         trainingSet = reshape(datasetStruct.training.images, 28, 28, 1, []);
         % trainingSet = dlarray(trainingSet, "SSCB");
     elseif strcmp(dataset, 'lognorm') | strcmp(dataset, "overlapping_lognorm")
+        datasetStruct = load(sprintf("datasets/%s.mat", dataset));
         trainingSet = datasetStruct.out(:,1:2)';
         % trainingSet = dlarray(trainingSet, "SB");
     else
