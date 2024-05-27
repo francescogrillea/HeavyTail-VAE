@@ -1,4 +1,5 @@
 addpath("layers")
+addpath("utility")
 
 clc; clear;
 
@@ -127,25 +128,7 @@ function dumpModel(config, trainStats, netE, netD)
     model_filename = sprintf("%s/model.mat", modelFolder);
     loss_filename = sprintf("%s/loss.mat", modelFolder);
     
-    save(model_filename, "netE", "netD");
-    lossHistory = trainStats.lossHistory;
+    save(model_filename, "netE", "netD", "config");
+    lossHistory = extractdata(trainStats.lossHistory);
     save(loss_filename, "lossHistory");
-end
-
-function trainingSet = loadDataset(dataset)
-
-    if strcmp(dataset, 'exp_mnist')
-        datasetStruct = load("datasets/mnist.mat");
-        trainingSet = exp(reshape(datasetStruct.training.images, 28, 28, 1, []));
-    elseif strcmp(dataset, 'mnist')
-        datasetStruct = load(sprintf("datasets/%s.mat", dataset));
-        trainingSet = reshape(datasetStruct.training.images, 28, 28, 1, []);
-        % trainingSet = dlarray(trainingSet, "SSCB");
-    elseif strcmp(dataset, 'lognorm') | strcmp(dataset, "overlapping_lognorm")
-        datasetStruct = load(sprintf("datasets/%s.mat", dataset));
-        trainingSet = datasetStruct.out(:,1:2)';
-        % trainingSet = dlarray(trainingSet, "SB");
-    else
-        error("Dataset not supported")
-    end
 end
