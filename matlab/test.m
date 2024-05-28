@@ -23,8 +23,8 @@ function test(netE, netD, XTest, labels, runID)
         reconstructed = forward(netD, forward(netE, image));
         % reconstructed = log(reconstructed);
     
-        nexttile; imshow(extractdata(image));
-        nexttile; imshow(extractdata(reconstructed));
+        nexttile; imagesc(extractdata(image));
+        nexttile; imagesc(extractdata(reconstructed));
     end
 
     img_path = sprintf('model_dumps/%s/reconstructed_images.png', runID);
