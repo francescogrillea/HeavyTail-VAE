@@ -16,10 +16,11 @@ function [trainingSet, trainingLabels, testSet, testLabels] = loadDataset(datase
 
     elseif strcmp(dataset, 'lognorm') | strcmp(dataset, "overlapping_lognorm")
         datasetStruct = load(sprintf("datasets/%s.mat", dataset));
-        trainingSet = datasetStruct.out(:,1:2)';
-        trainingLabels = datasetStruct.out(:, 3);
-        % testSet = 
-        % trainingLabels =
+        % trainingSet = datasetStruct.out(:,1:2)';
+        trainingSet = datasetStruct.training.instances;
+        trainingLabels = datasetStruct.training.labels;
+        testSet = datasetStruct.test.instances;
+        testLabels = datasetStruct.test.labels;
     else
         error("Dataset not supported")
     end
