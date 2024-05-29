@@ -14,7 +14,7 @@ function [trainingSet, trainingLabels, testSet, testLabels] = loadDataset(datase
         testSet = reshape(datasetStruct.test.images, 28, 28, 1, []);
         testLabels = datasetStruct.test.labels;
 
-    elseif strcmp(dataset, 'lognorm') | strcmp(dataset, "overlapping_lognorm")
+    elseif strcmp(dataset, 'lognorm') | strcmp(dataset, "overlapping_lognorm") | strcmp(dataset, 'lognorm_rescaled')
         datasetStruct = load(sprintf("datasets/%s.mat", dataset));
         % trainingSet = datasetStruct.out(:,1:2)';
         trainingSet = datasetStruct.training.instances;

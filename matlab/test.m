@@ -1,6 +1,6 @@
 function avgLossTest = test(netE, netD, XTest, labels, config)
 
-    runID = config.timestamp;
+    runID = config.runID;
     batchDimension = length(config.inputSize) + 1;
     dsTest = arrayDatastore(XTest, IterationDimension=batchDimension);
     numOutputs = 1;

@@ -16,7 +16,8 @@ for i=1:nargin
     n_configs = size(config_file, 1);
     for j=1:n_configs
         config = config_file(j);
-        config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
+        % config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
+        config.runID = sprintf("%s-%s-%s", config.dataset, config.encoder(end).layerType, datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss'));
     
         % Load Dataset
         [XTrain, YTrain, XTest, YTest] = loadDataset(config.dataset);
@@ -64,7 +65,7 @@ end
 function stats = generateStatistics(config, trainStats)
     
     stats = struct;
-    stats.timestamp = config.timestamp;
+    stats.runID = config.runID;
     stats.dataset = config.dataset;
 
     stats.samplingLayer = config.encoder(end).layerType;
@@ -122,7 +123,7 @@ function dumpModel(config, trainStats, netE, netD)
         mkdir(baseFolder);
     end
     
-    modelFolder = sprintf("%s/%s", baseFolder, config.timestamp);
+    modelFolder = sprintf("%s/%s", baseFolder, config.runID);
     mkdir(modelFolder);
 
     plot_filename = sprintf("%s/training_loss.png", modelFolder);
