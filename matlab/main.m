@@ -9,7 +9,6 @@ if nargin < 1
     error("Pass at least 1 config file as argument");
 end
 
-config_files = [];
 for i=1:nargin
     config_name = varargin{i};
     config_file = read_config(config_name);
@@ -37,6 +36,7 @@ for i=1:nargin
     
         saveStatistics(stats);
     end
+end
 end
 
 
