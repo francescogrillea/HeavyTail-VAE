@@ -1,33 +1,42 @@
+function main(varargin)
+
 addpath("layers")
 addpath("utility")
 
-clc; clear;
+clc;
 
-% iterate through different configs
-configs = read_config("config.json");
-n_configs = size(configs, 1);
-for i=1:n_configs
-    config = configs(i);
-    if n_configs == 1
-        config = config{1};
+if nargin < 1
+    error("Pass at least 1 config file as argument");
+end
+
+config_files = [];
+for i=1:nargin
+    config_name = varargin{i};
+    config_file = read_config(config_name);
+
+    n_configs = size(config_file, 1);
+    for j=1:n_configs
+        config = config_file(j);
+        config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
+    
+        % Load Dataset
+        [XTrain, YTrain, XTest, YTest] = loadDataset(config.dataset);
+
+        % Build Model
+        [netE, netD] = buildModel(config);
+
+        % Train Model
+        [netE, netD, trainStats] = train(netE, netD, XTrain, config);
+
+        dumpModel(config, trainStats, netE, netD);
+        stats = generateStatistics(config, trainStats);
+
+        % Test Model
+        avgTestLoss = test(netE, netD, XTest, YTest, config);
+        stats.testLoss = avgTestLoss;
+    
+        saveStatistics(stats);
     end
-    config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
-
-    % Load Dataset
-    XTrain = loadDataset(config.dataset);
-
-    % Build Model
-    [netE, netD] = buildModel(config);
-
-    % Train Model
-    [netE, netD, trainStats] = train(netE, netD, XTrain, config);
-        
-    stats = generateStatistics(config, trainStats);
-    saveStatistics(stats);
-    dumpModel(config, trainStats, netE, netD);
-
-    % Test Model
-    % test(netE, netD, config.numLatentChannels, XTest(:,:,:,1:5));
 end
 
 
@@ -55,7 +64,7 @@ end
 function stats = generateStatistics(config, trainStats)
     
     stats = struct;
-    stats.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
+    stats.timestamp = config.timestamp;
     stats.dataset = config.dataset;
 
     stats.samplingLayer = config.encoder(end).layerType;
