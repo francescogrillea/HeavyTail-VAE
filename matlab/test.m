@@ -27,7 +27,7 @@ function avgLossTest = test(netE, netD, XTest, labels, config)
     avgLossTest = mean(lossHistoryTest);
     fprintf("Loss on Test Set: %.4f\n", avgLossTest);
 
-    if strcmp(config.dataset, "mnist")
+    if strcmp(config.dataset, "mnist") | strcmp(config.dataset, "mnist_exp")
     
         chosenLabels_idx = [];
         for i=0:9
@@ -42,18 +42,39 @@ function avgLossTest = test(netE, netD, XTest, labels, config)
         numTestImages = size(XTest, 4);
         
         fig = figure;
-        tiledlayout(numTestImages, 2, 'TileSpacing', 'compact', 'Padding', 'compact');
+        tiledlayout(2, numTestImages, 'TileSpacing', 'compact', 'Padding', 'compact');
+        set(fig, 'Position', [200, 200, 1000, 300]);
         
         XTest = dlarray(XTest, "SSCB");
         for i = 1:numTestImages
             image = XTest(:,:,:,i);
-            % exp_image = exp(image);
-            % reconstructed = forward(netD, forward(netE, exp_image));
+            if strcmp(config.dataset, "mnist_exp")
+                nexttile; imagesc(extractdata(log(image)));
+                axis image;
+            else
+                nexttile; imagesc(extractdata(image));
+                axis image;
+            end
+            if i == 1
+                title('Original Images');
+            end
+        end
+        for i = 1:numTestImages
+            image = XTest(:,:,:,i);
             reconstructed = forward(netD, forward(netE, image));
-            % reconstructed = log(reconstructed);
-        
-            nexttile; imagesc(extractdata(image));
-            nexttile; imagesc(extractdata(reconstructed));
+            if strcmp(config.dataset, "mnist_exp")
+                nexttile; imagesc(extractdata(log(reconstructed)));
+                axis image;
+            else
+                nexttile; imagesc(extractdata(reconstructed));
+                axis image;
+            end
+            if i == 1
+                title('Reconstructed Images');
+            end
+        end
+
+
         end
         img_path = sprintf('model_dumps/%s/reconstructed_images.png', runID);
         saveas(fig, img_path);
