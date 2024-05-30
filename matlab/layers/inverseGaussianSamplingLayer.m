@@ -16,12 +16,12 @@ classdef inverseGaussianSamplingLayer < nnet.layer.Layer
             layer.Name = args.Name;
             layer.Type = "InverseGaussianSampling";
             layer.Description = "Mean and shape inverse gaussian sampling";
-            layer.OutputNames = ["out" "mean" "shape"];
-            layer.NumOutputs = 3;
+            layer.OutputNames = ["out" "kl"];
+            layer.NumOutputs = 2;
         end
     
-        function [Z, mu, shape] = predict(~,X)
-            % [Z,mu,shape] = predict(~,Z) Forwards input data through
+        function [Z, KL] = predict(~,X)
+            % [Z,KL] = predict(~,Z) Forwards input data through
             % the layer at prediction and training time and output the
             % result.
             %
@@ -31,9 +31,8 @@ classdef inverseGaussianSamplingLayer < nnet.layer.Layer
             %             shape, respectively, and K is the number 
             %             of latent channels.
             % Outputs:
-            %         Z     - Sampled output
-            %         mu    - Mean vector.
-            %         shape - Shape vector
+            %         Z          - Sampled output
+            %         KL         - KL divergence with IG(1,1)
 
             % Data dimensions.
             numLatentChannels = size(X,1)/2;
@@ -53,6 +52,8 @@ classdef inverseGaussianSamplingLayer < nnet.layer.Layer
             temp = (mu.^2) ./ Z;
             Z(~mask) = temp(~mask);
 
+            % http://www.mathem.pub.ro/proc/bsgp-28/K28-ba-ZKH72.pdf
+            KL = 0.5*(log(lambda) + mu + 1./mu + 1./lambda - 3);
         end
 
     end
