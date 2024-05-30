@@ -62,10 +62,20 @@ while epoch < config.numEpochs && ~monitor.Stop
         iteration = iteration + 1;
 
         % Read mini-batch of data.
-        X = next(mbq);
+        X_origin = next(mbq);
+        X = X_origin;
+        if isfield(config, "noise")
+            if strcmp(config.noise, "normal")
+                X = X_origin + randn(size(X));
+            elseif strcmp(config.noise, "logNormal")
+                X = X_origin + lognrnd(size(X));
+            elseif strcmp(config.noise, "uniform")
+                X = X_origin + rand(size(X));
+            end
+        end
 
         % Evaluate loss and gradients.
-        [loss,gradientsE,gradientsD] = dlfeval(@modelLoss,netE,netD,X);
+        [loss,gradientsE,gradientsD] = dlfeval(@modelLoss,netE, netD, X, X_origin);
 
         % Update learnable parameters.
         [netE,trailingAvgE,trailingAvgSqE] = adamupdate(netE, ...
@@ -92,7 +102,12 @@ stats.avgEpochTime = mean(epochTimes);
 stats.lossHistory = lossHistory;
 
 
-function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X)
+function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X, X_true)
+
+    if nargin < 4
+        X_true = X;
+    end
+
     % Forward through encoder.
     % [Z, mu, logSigmaSq] = forward(netE, X);
     Z = forward(netE, X);
@@ -101,7 +116,7 @@ function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X)
     Y = forward(netD, Z);
     
     % Calculate loss and gradients.
-    reconstructionLoss = mse(Y, X);
+    reconstructionLoss = mse(Y, X_true);
     
     % KL = -0.5 * sum(1 + logSigmaSq - mu.^2 - exp(logSigmaSq), 1);
     % KL = mean(KL);
