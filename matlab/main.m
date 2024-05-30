@@ -67,6 +67,7 @@ function stats = generateStatistics(config, trainStats)
     stats = struct;
     stats.runID = config.runID;
     stats.dataset = config.dataset;
+    stats.noise = config.noise;
 
     stats.samplingLayer = config.encoder(end).layerType;
     stats.numLatentChannels = config.numLatentChannels;
@@ -76,6 +77,11 @@ function stats = generateStatistics(config, trainStats)
     stats.numEpochs =  config.numEpochs;
     stats.learningRate = config.learningRate;
     stats.batchSize = config.batchSize;
+    stats.kl = false;
+    if isfield(config, "kl")
+        stats.kl = config.kl;
+    end
+    
 
     if isfield(config, "notes")
         stats.notes = config.notes;
