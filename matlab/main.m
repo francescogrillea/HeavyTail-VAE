@@ -141,4 +141,7 @@ function dumpModel(config, trainStats, netE, netD)
     save(model_filename, "netE", "netD", "config");
     lossHistory = extractdata(trainStats.lossHistory);
     save(loss_filename, "lossHistory");
+
+    config_filename = sprintf("%s/config.mat", modelFolder);
+    save(config_filename, "config");
 end
