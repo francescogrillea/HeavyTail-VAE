@@ -53,7 +53,7 @@ classdef inverseGaussianSamplingLayer < nnet.layer.Layer
             Z(~mask) = temp(~mask);
 
             % http://www.mathem.pub.ro/proc/bsgp-28/K28-ba-ZKH72.pdf
-            KL = 0.5*(log(lambda) + mu + 1./mu + 1./lambda - 3);
+            KL = 0.5*(log(shape) + mu + 1./mu + 1./shape - 3);
         end
 
     end
