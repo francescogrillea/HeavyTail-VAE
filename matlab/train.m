@@ -7,6 +7,9 @@ end
 if ~isfield(config, "interactiveLoss")
     config.interactiveLoss = false;
 end
+if ~isfield(config, "noise")
+    config.noise = false;
+end
 
 batchDimension = length(config.inputSize) + 1;
 
@@ -77,6 +80,10 @@ while epoch < config.numEpochs && ~monitor.Stop
         % Evaluate loss and gradients.
         [loss,gradientsE,gradientsD] = dlfeval(@modelLoss,netE, netD, X, X_origin);
 
+        if loss > 1e6
+            disp("");
+        end
+
         % Update learnable parameters.
         [netE,trailingAvgE,trailingAvgSqE] = adamupdate(netE, ...
             gradientsE, trailingAvgE, trailingAvgSqE, iteration, config.learningRate);
@@ -109,8 +116,7 @@ function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X, X_true)
     end
 
     % Forward through encoder.
-    % [Z, mu, logSigmaSq] = forward(netE, X);
-    Z = forward(netE, X);
+    [Z, KL] = forward(netE, X);
     
     % Forward through decoder.
     Y = forward(netD, Z);
@@ -118,10 +124,8 @@ function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X, X_true)
     % Calculate loss and gradients.
     reconstructionLoss = mse(Y, X_true);
     
-    % KL = -0.5 * sum(1 + logSigmaSq - mu.^2 - exp(logSigmaSq), 1);
-    % KL = mean(KL);
-    
-    loss = reconstructionLoss;% + KL;
+    KL = mean(KL);
+    loss = reconstructionLoss + KL;
     
     [gradientsE,gradientsD] = dlgradient(loss, netE.Learnables, netD.Learnables);
 end

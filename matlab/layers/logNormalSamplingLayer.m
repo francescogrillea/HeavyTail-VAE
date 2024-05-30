@@ -16,11 +16,11 @@ classdef logNormalSamplingLayer < nnet.layer.Layer
             layer.Name = args.Name;
             layer.Type = "LogNormalSampling";
             layer.Description = "Mean and log-variance log normal sampling";
-            layer.OutputNames = ["out" "mean" "log-variance"];
-            layer.NumOutputs = 3;
+            layer.OutputNames = ["out" "kl"];
+            layer.NumOutputs = 2;
         end
     
-        function [Z,mu,logSigmaSq] = predict(~,X)
+        function [Z, KL] = predict(~,X)
             % [Z,mu,logSigmaSq] = predict(~,Z) Forwards input data through
             % the layer at prediction and training time and output the
             % result.
@@ -32,8 +32,7 @@ classdef logNormalSamplingLayer < nnet.layer.Layer
             %             of latent channels.
             % Outputs:
             %         Z          - Sampled output
-            %         mu         - Mean vector.
-            %         logSigmaSq - Log-variance vector
+            %         KL         - KL divergence with LogNormal(0,1)
 
             % Data dimensions.
             numLatentChannels = size(X,1)/2;
@@ -48,6 +47,7 @@ classdef logNormalSamplingLayer < nnet.layer.Layer
             sigma = exp(.5 * logSigmaSq);
             Z = exp(epsilon .* sigma + mu);
         
+            KL = -0.5 * sum(1 + logSigmaSq - mu.^2 - exp(logSigmaSq), 1);
         end
 
     end
