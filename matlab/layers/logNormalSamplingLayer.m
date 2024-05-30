@@ -20,7 +20,7 @@ classdef logNormalSamplingLayer < nnet.layer.Layer
             layer.NumOutputs = 2;
         end
     
-        function [Z,mu,logSigmaSq] = predict(~,X)
+        function [Z, KL] = predict(~,X)
             % [Z,mu,logSigmaSq] = predict(~,Z) Forwards input data through
             % the layer at prediction and training time and output the
             % result.
