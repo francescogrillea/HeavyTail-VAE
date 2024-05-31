@@ -124,7 +124,7 @@ function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X, X_true)
     % Calculate loss and gradients.
     reconstructionLoss = mse(Y, X_true);
     
-    KL = mean(KL);
+    KL = mean(KL, "all");
     loss = reconstructionLoss + KL;
     
     [gradientsE,gradientsD] = dlgradient(loss, netE.Learnables, netD.Learnables);
