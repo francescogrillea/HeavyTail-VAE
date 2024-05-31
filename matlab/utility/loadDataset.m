@@ -1,6 +1,6 @@
 function [trainingSet, trainingLabels, testSet, testLabels] = loadDataset(dataset)
 
-    if strcmp(dataset, 'exp_mnist')
+    if strcmp(dataset, 'mnist_exp')
         datasetStruct = load("datasets/mnist.mat");
         trainingSet = exp(reshape(datasetStruct.training.images, 28, 28, 1, []));
         trainingLabels = datasetStruct.training.labels;
