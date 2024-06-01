@@ -65,20 +65,24 @@ while epoch < config.numEpochs && ~monitor.Stop
         iteration = iteration + 1;
 
         % Read mini-batch of data.
-        X_origin = next(mbq);
-        X = X_origin;
+        X = next(mbq);
+        X_true = X;
         if isfield(config, "noise")
             if strcmp(config.noise, "normal")
-                X = X_origin + randn(size(X));
+                X = X_true + randn(size(X));
             elseif strcmp(config.noise, "logNormal")
-                X = X_origin + lognrnd(size(X));
+                X = X_true + lognrnd(size(X));
             elseif strcmp(config.noise, "uniform")
-                X = X_origin + rand(size(X));
+                X = X_true + rand(size(X));
             end
         end
 
+        if isfield(config, "noise") && strcmp(config.noise, "multichannel")
+            X_true = X(:,:,1,:);
+        end
+
         % Evaluate loss and gradients.
-        [loss,gradientsE,gradientsD] = dlfeval(@modelLoss,netE, netD, X, X_origin);
+        [loss,gradientsE,gradientsD] = dlfeval(@modelLoss, netE, netD, X, X_true);
 
         if loss > 1e6
             disp("");
