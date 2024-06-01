@@ -77,7 +77,7 @@ while epoch < config.numEpochs && ~monitor.Stop
             end
         end
 
-        if isfield(config, "noise") && strcmp(config.noise, "multichannel")
+        if strcmp(config.dataset, "mnist3d")
             X_true = X(:,:,1,:);
         end
 
