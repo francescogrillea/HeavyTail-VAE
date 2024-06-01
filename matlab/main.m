@@ -15,9 +15,8 @@ for i=1:nargin
 
     n_configs = size(config_file, 1);
     for j=1:n_configs
-        config = config_file(j);
-        % config.timestamp = datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss');
-        config.runID = sprintf("%s-%s-%s", config.dataset, config.encoder(end).layerType, datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss'));
+
+        config = standardize_config(config_file(j));
     
         % Load Dataset
         [XTrain, YTrain, XTest, YTest] = loadDataset(config.dataset);
@@ -43,6 +42,20 @@ end
 
 
 %%% ======= UTILITY FUNCTIONS ======= %%%
+
+function config = standardize_config(config)
+    config.runID = sprintf("%s-%s-%s", config.dataset, config.encoder(end).layerType, datestr(datetime('now'), 'yyyy-mm-dd_HH-MM-ss'));
+
+    if ~isfield(config, "interactiveLoss")
+        config.interactiveLoss = false;
+    end
+    if ~isfield(config, "noise")
+        config.noise = false;
+    end
+    if ~isfield(config, "KL")
+        config.KL = 0;
+    end
+end
 
 % read config file
 function config = read_config(filename)
@@ -105,10 +118,7 @@ function stats = generateStatistics(config, trainStats)
     stats.numEpochs =  config.numEpochs;
     stats.learningRate = config.learningRate;
     stats.batchSize = config.batchSize;
-    stats.kl = false;
-    if isfield(config, "kl")
-        stats.kl = config.kl;
-    end
+    stats.KL = config.KL;
     
 
     if isfield(config, "notes")
