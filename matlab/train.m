@@ -4,13 +4,6 @@ if nargin < 4
     error("Must provide a config")
 end
 
-if ~isfield(config, "interactiveLoss")
-    config.interactiveLoss = false;
-end
-if ~isfield(config, "noise")
-    config.noise = false;
-end
-
 batchDimension = length(config.inputSize) + 1;
 
 if config.interactiveLoss
