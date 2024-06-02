@@ -71,7 +71,7 @@ while epoch < config.numEpochs && ~monitor.Stop
             if strcmp(config.noise, "normal")
                 X = X_true + randn(size(X));
             elseif strcmp(config.noise, "logNormal")
-                X = X_true + lognrnd(size(X));
+                X = X_true + lognrnd(0, 0.1, size(X));
             elseif strcmp(config.noise, "uniform")
                 X = X_true + rand(size(X));
             end
@@ -82,7 +82,7 @@ while epoch < config.numEpochs && ~monitor.Stop
         end
 
         % Evaluate loss and gradients.
-        [loss,gradientsE,gradientsD] = dlfeval(@modelLoss, netE, netD, X, X_true);
+        [loss,gradientsE,gradientsD] = dlfeval(@modelLoss,netE, netD, X, X_true, config.KL);
 
         if loss > 1e6
             disp("");
@@ -113,7 +113,7 @@ stats.avgEpochTime = mean(epochTimes);
 stats.lossHistory = lossHistory;
 
 
-function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X, X_true)
+function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X, X_true, beta)
 
     if nargin < 4
         X_true = X;
@@ -129,7 +129,7 @@ function [loss, gradientsE, gradientsD] = modelLoss(netE, netD, X, X_true)
     reconstructionLoss = mse(Y, X_true);
     
     KL = mean(KL, "all");
-    loss = reconstructionLoss + KL;
+    loss = (reconstructionLoss + beta * KL) / (1+beta);
     
     [gradientsE,gradientsD] = dlgradient(loss, netE.Learnables, netD.Learnables);
 end
