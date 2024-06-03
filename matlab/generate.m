@@ -13,7 +13,7 @@ function generate(varargin)
         % init figure 
         fig = figure;
         tiledlayout(1, 10, 'TileSpacing', 'compact', 'Padding', 'compact');
-        set(fig, 'Position', [200, 200, 700, 300]);
+        set(fig, 'Position', [200, 200, 800, 150]);
             
         % load model 
         base_path = sprintf("model_dumps/%s", runID);
@@ -46,10 +46,12 @@ function generate(varargin)
 
             generated = forward(netD, sample);
             nexttile; 
+            % title(sprintf("%d", l));
+            title("a");
             imagesc(extractdata(generated));
             axis image;
         end
-        img_path = sprintf('model_dumps/%s/generated_images.png', runID);
-        saveas(fig, img_path);
+        % img_path = sprintf('model_dumps/%s/generated_images.png', runID);
+        % saveas(fig, img_path);
     end
 end

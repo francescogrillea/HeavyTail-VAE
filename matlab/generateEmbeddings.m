@@ -28,20 +28,20 @@ function generateEmbeddings(varargin)
         % Batch Approach
         batchDimension = length(config.inputSize) + 1;
         dsTestX = arrayDatastore(XTest, IterationDimension=batchDimension);
-        dsTestY = arrayDatastore(YTest, IterationDimension=batchDimension);
+        dsTestY = arrayDatastore(YTest, IterationDimension=1);
         dsTest = combine(dsTestX, dsTestY); % Combine XTest and YTest
 
         numOutputs = 2;
         mbq = minibatchqueue(dsTest, numOutputs, ...
             MiniBatchSize = config.batchSize, ...
-            MiniBatchFcn=@(dataX, dataY) deal(cat(batchDimension, dataX{:}), cat(batchDimension, dataY{:})), ...
+            MiniBatchFcn=@(dataX, dataY) deal(cat(batchDimension, dataX{:}), cat(1, dataY{:})), ...
             MiniBatchFormat=config.batchFormat);
         
         embeddings = struct;
-        layersToKeep = netE.Layers(1:end-1);
-        truncatedNet = dlnetwork(layersToKeep);
+        truncatedNet = removeLayers(netE, netE.Layers(end).Name);
+        truncatedNet = initialize(truncatedNet);
         
-        shuffle(mbq);
+        % shuffle(mbq);
         while hasdata(mbq)
     
             [X, YTrue] = next(mbq);
@@ -50,10 +50,10 @@ function generateEmbeddings(varargin)
             for i=1:size(YTrue, 1)
                 label = YTrue(i);
                 l = sprintf('x%d', label);
-                if isfield(l, embeddings)
-                    embeddings.(l) = embeddings.(l) + Z;
+                if isfield(embeddings, l)
+                    embeddings.(l) = embeddings.(l) + Z(:,i);
                 else
-                    embeddings.(l) = Z;
+                    embeddings.(l) = Z(:,i);
                 end
             end
         end
@@ -66,8 +66,7 @@ function generateEmbeddings(varargin)
         end
         elapsedTime = toc;
         fprintf("Completed in %.4fs\n", elapsedTime);
-
-
+        
         embeddings_filename = sprintf("%s/embeddings.mat", base_path);
         save(embeddings_filename, "embeddings");
     end
