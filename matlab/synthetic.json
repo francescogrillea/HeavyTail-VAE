@@ -1,0 +1,245 @@
+[
+
+  {
+    "dataset": "lognorm",
+    "inputSize": [2],
+    "batchFormat": "CB",
+    "numLatentChannels": 2,
+    "numDistributionParameters": 2,
+    "numEpochs": 50,
+    "learningRate": 3e-4,
+    "batchSize": 100,
+    "KL": 0.01,
+    "plotLoss": true,
+    "interactiveLoss": false,
+    "encoder": [
+      {
+        "layerType": "featureInputLayer",
+        "defaultArg": 2
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10,
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10,
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": "config.numLatentChannels * config.numDistributionParameters",
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "normalSamplingLayer"
+      }
+    ],
+    "decoder": [
+      {
+        "layerType": "featureInputLayer",
+        "defaultArg": "config.numLatentChannels"
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": "prod(config.inputSize)"
+      }
+    ]
+  },
+
+  {
+    "dataset": "lognorm",
+    "inputSize": [2],
+    "batchFormat": "CB",
+    "numLatentChannels": 2,
+    "numDistributionParameters": 2,
+    "numEpochs": 50,
+    "learningRate": 3e-4,
+    "batchSize": 100,
+    "KL": 0.01,
+    "plotLoss": true,
+    "interactiveLoss": false,
+    "encoder": [
+      {
+        "layerType": "featureInputLayer",
+        "defaultArg": 2
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10,
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10,
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": "config.numLatentChannels * config.numDistributionParameters",
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "logNormalSamplingLayer"
+      }
+    ],
+    "decoder": [
+      {
+        "layerType": "featureInputLayer",
+        "defaultArg": "config.numLatentChannels"
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": "prod(config.inputSize)"
+      }
+    ]
+  },
+
+  {
+    "dataset": "lognorm",
+    "inputSize": [2],
+    "batchFormat": "CB",
+    "numLatentChannels": 2,
+    "numDistributionParameters": 2,
+    "numEpochs": 50,
+    "learningRate": 3e-4,
+    "batchSize": 100,
+    "KL": 0.01,
+    "plotLoss": true,
+    "interactiveLoss": false,
+    "encoder": [
+      {
+        "layerType": "featureInputLayer",
+        "defaultArg": 2
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10,
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10,
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": "config.numLatentChannels * config.numDistributionParameters",
+        "weightsInitializer": "'narrow-normal'"
+      },
+      {
+        "layerType": "positiveEluLayer"
+      },
+      {
+        "layerType": "inverseGaussianSamplingLayer"
+      }
+    ],
+    "decoder": [
+      {
+        "layerType": "featureInputLayer",
+        "defaultArg": "config.numLatentChannels"
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": 10
+      },
+      {
+        "layerType": "leakyReluLayer",
+        "defaultArg": 0.01
+      },
+      {
+        "layerType": "fullyConnectedLayer",
+        "defaultArg": "prod(config.inputSize)"
+      }
+    ]
+  }
+]

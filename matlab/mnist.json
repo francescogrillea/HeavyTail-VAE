@@ -1,0 +1,248 @@
+[
+    {
+        "dataset": "mnist",
+        "inputSize": [28, 28, 1],
+        "numLatentChannels": 10,
+        "numDistributionParameters": 2,
+        "numEpochs": 100,
+        "learningRate": 3e-4,
+        "batchSize": 512,
+        "KL": 0.01,
+        "batchFormat": "SSCB",
+        "plotLoss": true,
+        "interactiveLoss": false,
+        "encoder": [
+            {
+                "layerType": "imageInputLayer",
+                "defaultArg": "config.inputSize"
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": "config.numLatentChannels * config.numDistributionParameters"
+            },
+            {
+                "layerType": "normalSamplingLayer"
+            }
+        ],
+        "decoder": [
+            {
+                "layerType": "featureInputLayer",
+                "defaultArg": "config.numLatentChannels"
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": "prod(config.inputSize)"
+            },
+            {
+                "layerType": "reshapeLayer",
+                "defaultArg": "config.inputSize"
+            }
+        ]
+    },
+
+    {
+        "dataset": "mnist",
+        "inputSize": [28, 28, 1],
+        "numLatentChannels": 10,
+        "numDistributionParameters": 2,
+        "numEpochs": 100,
+        "learningRate": 3e-4,
+        "batchSize": 512,
+        "KL": 0.01,
+        "batchFormat": "SSCB",
+        "plotLoss": true,
+        "interactiveLoss": false,
+        "encoder": [
+            {
+                "layerType": "imageInputLayer",
+                "defaultArg": "config.inputSize"
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": "config.numLatentChannels * config.numDistributionParameters"
+            },
+            {
+                "layerType": "logNormalSamplingLayer"
+            }
+        ],
+        "decoder": [
+            {
+                "layerType": "featureInputLayer",
+                "defaultArg": "config.numLatentChannels"
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": "prod(config.inputSize)"
+            },
+            {
+                "layerType": "reshapeLayer",
+                "defaultArg": "config.inputSize"
+            }
+        ]
+    },
+
+    {
+        "dataset": "mnist",
+        "inputSize": [28, 28, 1],
+        "numLatentChannels": 10,
+        "numDistributionParameters": 2,
+        "numEpochs": 100,
+        "learningRate": 3e-4,
+        "batchSize": 512,
+        "KL": 0.01,
+        "batchFormat": "SSCB",
+        "plotLoss": true,
+        "interactiveLoss": false,
+        "encoder": [
+            {
+                "layerType": "imageInputLayer",
+                "defaultArg": "config.inputSize"
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": "config.numLatentChannels * config.numDistributionParameters"
+            },
+            {
+                "layerType": "positiveEluLayer"
+            },
+            {
+                "layerType": "inverseGaussianSamplingLayer"
+            }
+        ],
+        "decoder": [
+            {
+                "layerType": "featureInputLayer",
+                "defaultArg": "config.numLatentChannels"
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": 300
+            },
+            {
+                "layerType": "leakyReluLayer",
+                "defaultArg": 0.01
+            },
+            {
+                "layerType": "fullyConnectedLayer",
+                "defaultArg": "prod(config.inputSize)"
+            },
+            {
+                "layerType": "reshapeLayer",
+                "defaultArg": "config.inputSize"
+            }
+        ]
+    }
+]
+  
