@@ -37,15 +37,11 @@ function generateEmbeddings(varargin)
             MiniBatchFcn=@(dataX, dataY) deal(cat(batchDimension, dataX{:}), cat(batchDimension, dataY{:})), ...
             MiniBatchFormat=config.batchFormat);
         
-        shuffle(mbq);
-        
         embeddings = struct;
-
-        layerName = 'fullyConnectedLayer_3';
-        layerIndex = find(arrayfun(@(l) strcmp(l.Name, layerName), netE.Layers));
-        layersToKeep = netE.Layers(1:layerIndex);
+        layersToKeep = netE.Layers(1:end-1);
         truncatedNet = dlnetwork(layersToKeep);
-    
+        
+        shuffle(mbq);
         while hasdata(mbq)
     
             [X, YTrue] = next(mbq);
@@ -53,15 +49,13 @@ function generateEmbeddings(varargin)
             
             for i=1:size(YTrue, 1)
                 label = YTrue(i);
-                l = sprintf('%d', label);
-                disp(class(l));
+                l = sprintf('x%d', label);
                 if isfield(l, embeddings)
                     embeddings.(l) = embeddings.(l) + Z;
                 else
                     embeddings.(l) = Z;
                 end
             end
-            
         end
 
         

@@ -6,8 +6,6 @@ function generate(varargin)
     if nargin < 1
         error("Pass at least 1 model ID");
     end
-
-
     
     for m=1:nargin
         runID = varargin{m};
